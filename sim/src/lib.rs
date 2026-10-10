@@ -14,6 +14,8 @@ pub mod tuning;
 pub mod world;
 
 #[cfg(test)]
+mod survival_tests;
+#[cfg(test)]
 mod tests;
 
 /// The data table: generated from the installed game, or the ESTIMATE placeholder.
@@ -161,9 +163,13 @@ impl Sim {
     fn resolve_hits(&mut self) {
         let Some((def, from, to)) = self.player.weapon_line() else { return };
         let r = self.tuning.weapon_radius;
+        // Wolves and nodes: the swing sweeps down to the ground in front of you, so test reach
+        // in the horizontal plane and only require the body to be at about your height.
+        let feet = self.player.pos.y;
+        let flat = |v: Vec3| Vec3::new(v.x, 0.0, v.z);
         let reaches = |pos: Vec3, radius: f32, height: f32| {
-            let (a, b) = (pos + Vec3::Y * radius, pos + Vec3::Y * (height - radius).max(radius));
-            world::segment_distance(from, to, a, b) <= radius + r
+            let level = pos.y <= feet + 1.5 && pos.y + height >= feet - 0.5;
+            level && world::segment_distance(flat(from), flat(to), flat(pos), flat(pos)) <= radius + r
         };
         let wolf = self.survival.wolves.iter().position(|w| {
             reaches(w.pos, self.content.enemies[w.kind].radius, survival::WOLF_HEIGHT)

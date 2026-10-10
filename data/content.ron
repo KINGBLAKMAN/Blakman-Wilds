@@ -68,11 +68,11 @@
         (output: "stone_pickaxe", count: 1, inputs: [("log", 2), ("stone", 3)],                  station: Some("workbench"), level: 1, xp: 15.0),
         (output: "wooden_club",   count: 1, inputs: [("log", 3)],                                station: Some("workbench"), level: 1, xp: 15.0),
         (output: "furnace",       count: 1, inputs: [("stone", 8), ("log", 2)],                  station: Some("workbench"), level: 2, xp: 20.0),
-        (output: "iron_bar",      count: 1, inputs: [("iron_ore", 2), ("log", 1)],               station: Some("furnace"),   level: 2, xp: 10.0),
+        (output: "iron_bar",      count: 1, inputs: [("iron_ore", 3), ("log", 1)],               station: Some("furnace"),   level: 2, xp: 10.0),
         (output: "iron_axe",      count: 1, inputs: [("iron_bar", 2), ("log", 2)],               station: Some("workbench"), level: 3, xp: 20.0),
         (output: "iron_pickaxe",  count: 1, inputs: [("iron_bar", 2), ("log", 2)],               station: Some("workbench"), level: 3, xp: 20.0),
         (output: "iron_sword",    count: 1, inputs: [("iron_bar", 3), ("wolf_pelt", 1)],         station: Some("workbench"), level: 3, xp: 25.0),
-        (output: "beacon",        count: 1, inputs: [("log", 10), ("stone", 10), ("iron_bar", 4)], station: Some("workbench"), level: 4, xp: 50.0),
+        (output: "beacon",        count: 1, inputs: [("log", 20), ("stone", 20), ("iron_bar", 6), ("wolf_pelt", 2)], station: Some("workbench"), level: 4, xp: 50.0),
     ],
 
     // Gathered by the swing's hit window. tool: which tool kind helps (min_tier 0 = bare hands
