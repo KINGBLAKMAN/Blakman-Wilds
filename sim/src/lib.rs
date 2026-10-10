@@ -5,6 +5,7 @@
 //! can be tested headless and replayed exactly. The app only feeds input and draws state.
 
 pub mod actions;
+pub mod bot;
 pub mod content;
 pub mod events;
 pub mod input;
@@ -135,7 +136,8 @@ impl Sim {
             let d = &self.content.nodes[n.kind];
             (n.pos, d.radius, d.height)
         });
-        let bodies: Vec<_> = self.targets.iter().filter(|t| t.alive()).map(|t| (t.pos, t.radius, t.height)).chain(nodes).collect();
+        let built = self.survival.structures.iter().map(|s| (s.pos, self.content.footprint(s.item), 2.0));
+        let bodies: Vec<_> = self.targets.iter().filter(|t| t.alive()).map(|t| (t.pos, t.radius, t.height)).chain(nodes).chain(built).collect();
         for (pos, radius, height) in bodies {
             let t = Target { pos, radius, height, hp: 1.0, max_hp: 1.0, respawn: 0.0 };
             let p = &mut self.player;

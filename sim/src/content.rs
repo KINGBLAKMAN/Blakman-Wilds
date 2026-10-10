@@ -51,7 +51,8 @@ pub enum ItemKind {
     Material,
     Food { hunger: f32, heal: f32 },
     Tool { kind: ToolKind, tier: u32, power: f32 },
-    Structure { model: String },
+    /// Built in the world; `radius` is its solid footprint.
+    Structure { model: String, radius: f32 },
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -231,4 +232,14 @@ impl Content {
 
 fn find(items: &[ItemDef], id: &str, what: &str) -> Result<ItemId, String> {
     items.iter().position(|i| i.id == id).ok_or_else(|| format!("{what}: unknown item '{id}'"))
+}
+
+impl Content {
+    /// Footprint radius of a structure item (0 for anything else).
+    pub fn footprint(&self, item: ItemId) -> f32 {
+        match self.items[item].kind {
+            ItemKind::Structure { radius, .. } => radius,
+            _ => 0.0,
+        }
+    }
 }

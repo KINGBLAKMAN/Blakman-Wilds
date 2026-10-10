@@ -35,3 +35,9 @@ Read `README.md` first for the design. Run `git pull origin main` before startin
 ## Left for the next local session
 - Player character and wolf models with animations (Blender), then wire them into `app/`.
 - Art skills: blender-asset-pipeline, procedural-lowpoly-modeling, game-animation-blender.
+
+## Done in the cloud session (2026-10-10)
+All of "You handle" above: survival systems in `sim/` with 23 new tests (47 total) and a scripted
+bot that plays to victory; `data/content.ron`; the Bevy app with models, island, day/night and HUD.
+Verified with headless screenshots (`docs/screenshots/`). Not verified: how it feels with real
+mouse and keyboard input, and performance on a real GPU. Play it locally and tune `content.ron`.

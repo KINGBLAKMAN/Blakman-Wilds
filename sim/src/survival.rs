@@ -342,7 +342,8 @@ impl Sim {
         if let ItemKind::Structure { .. } = self.content.items[out].kind {
             // Built things go straight into the world in front of you.
             let p = &self.player;
-            let pos = p.pos + p.facing() * self.content.tunables.place_distance;
+            let gap = self.content.tunables.place_distance + self.tuning.half_extents.x + self.content.footprint(out);
+            let pos = p.pos + p.facing() * gap;
             self.survival.structures.push(Structure { item: out, pos: Vec3::new(pos.x, 0.0, pos.z), yaw: p.yaw, lit: false });
             self.events.push(Event::Built { structure: self.survival.structures.len() - 1, item: out });
         } else {
@@ -377,7 +378,7 @@ impl Sim {
             .survival
             .structures
             .iter()
-            .position(|s| s.item == c.beacon && !s.lit && flat_dist(s.pos, pos) <= range)
+            .position(|s| s.item == c.beacon && !s.lit && flat_dist(s.pos, pos) <= range + c.footprint(s.item) + 0.3)
         else {
             return;
         };

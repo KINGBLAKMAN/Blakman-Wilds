@@ -19,8 +19,8 @@
         respawn_delay: 3.0,         // s dead before waking at camp
         respawn_hunger: 50.0,
         station_radius: 4.0,        // crafting needs the station within this distance
-        interact_range: 2.5,        // lighting the beacon
-        place_distance: 2.0,        // built structures appear this far in front of the player
+        interact_range: 1.0,        // lighting the beacon: this far from its edge
+        place_distance: 0.6,        // gap between you and a structure you build
         unarmed_damage: 10.0,
         combat_damage_per_level: 0.10,  // +10% weapon damage per Combat level above 1
         yield_levels_per_bonus: 3,  // +1 item per hit every N gathering levels above 1
@@ -33,7 +33,7 @@
         node_radius_scale: 1.0,
     ),
 
-    // kind: Material | Food(hunger, heal) | Tool(kind, tier, power) | Structure(model)
+    // kind: Material | Food(hunger, heal) | Tool(kind, tier, power) | Structure(model, radius)
     // ESTIMATE: all values.
     items: [
         (id: "log",           name: "Log",            kind: Material),
@@ -51,10 +51,10 @@
         (id: "iron_pickaxe",  name: "Iron Pickaxe",   kind: Tool(kind: Pickaxe, tier: 2, power: 24.0)),
         (id: "wooden_club",   name: "Wooden Club",    kind: Tool(kind: Weapon,  tier: 1, power: 22.0)),
         (id: "iron_sword",    name: "Iron Sword",     kind: Tool(kind: Weapon,  tier: 2, power: 40.0)),
-        (id: "campfire",      name: "Campfire",       kind: Structure(model: "campfire")),
-        (id: "workbench",     name: "Workbench",      kind: Structure(model: "workbench")),
-        (id: "furnace",       name: "Furnace",        kind: Structure(model: "furnace")),
-        (id: "beacon",        name: "Beacon",         kind: Structure(model: "beacon")),
+        (id: "campfire",      name: "Campfire",       kind: Structure(model: "campfire", radius: 0.7)),
+        (id: "workbench",     name: "Workbench",      kind: Structure(model: "workbench", radius: 0.9)),
+        (id: "furnace",       name: "Furnace",        kind: Structure(model: "furnace", radius: 0.9)),
+        (id: "beacon",        name: "Beacon",         kind: Structure(model: "beacon", radius: 1.7)),
     ],
 
     // station: structure that must be within station_radius; level: Crafting level needed.
