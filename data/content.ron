@@ -1,0 +1,114 @@
+#![enable(implicit_some)]
+// Emberwild game content. Loaded by `sim::content::Content` (embedded at build time).
+//
+// Source rule: Emberwild is an original game, so nothing here is measured. Every number in this
+// file is ESTIMATE: a starting guess to tune by playtesting. Units: metres, seconds, points.
+(
+    // ESTIMATE: all values.
+    tunables: (
+        day_length: 360.0,          // s per full day/night cycle
+        start_time: 0.30,           // time of day at start (0 = midnight, 0.5 = noon)
+        night_start: 0.80,          // night covers [night_start, 1) and [0, night_end)
+        night_end: 0.20,
+        health_max: 100.0,
+        hunger_max: 100.0,
+        hunger_drain: 0.25,         // hunger per s (full to empty in 400 s)
+        starve_damage: 2.0,         // health per s at zero hunger
+        regen_hunger_min: 60.0,     // health regenerates while hunger is above this
+        health_regen: 1.0,          // health per s
+        respawn_delay: 3.0,         // s dead before waking at camp
+        respawn_hunger: 50.0,
+        station_radius: 4.0,        // crafting needs the station within this distance
+        interact_range: 2.5,        // lighting the beacon
+        place_distance: 2.0,        // built structures appear this far in front of the player
+        unarmed_damage: 10.0,
+        combat_damage_per_level: 0.10,  // +10% weapon damage per Combat level above 1
+        yield_levels_per_bonus: 3,  // +1 item per hit every N gathering levels above 1
+        xp_base: 20.0,              // total XP for level L = xp_base * L * (L - 1) / 2
+        max_level: 10,
+        wolves_first_night: 2,
+        wolves_per_night: 1,        // extra wolves each later night
+        beacon_fuel: "torch",
+        beacon: "beacon",
+        node_radius_scale: 1.0,
+    ),
+
+    // kind: Material | Food(hunger, heal) | Tool(kind, tier, power) | Structure(model)
+    // ESTIMATE: all values.
+    items: [
+        (id: "log",           name: "Log",            kind: Material),
+        (id: "stone",         name: "Stone",          kind: Material),
+        (id: "iron_ore",      name: "Iron Ore",       kind: Material),
+        (id: "iron_bar",      name: "Iron Bar",       kind: Material),
+        (id: "wolf_pelt",     name: "Wolf Pelt",      kind: Material),
+        (id: "torch",         name: "Torch",          kind: Material),
+        (id: "berries",       name: "Berries",        kind: Food(hunger: 12.0, heal: 2.0)),
+        (id: "raw_meat",      name: "Raw Meat",       kind: Food(hunger: 8.0,  heal: 0.0)),
+        (id: "cooked_meat",   name: "Cooked Meat",    kind: Food(hunger: 35.0, heal: 15.0)),
+        (id: "stone_axe",     name: "Stone Axe",      kind: Tool(kind: Axe,     tier: 1, power: 18.0)),
+        (id: "stone_pickaxe", name: "Stone Pickaxe",  kind: Tool(kind: Pickaxe, tier: 1, power: 16.0)),
+        (id: "iron_axe",      name: "Iron Axe",       kind: Tool(kind: Axe,     tier: 2, power: 26.0)),
+        (id: "iron_pickaxe",  name: "Iron Pickaxe",   kind: Tool(kind: Pickaxe, tier: 2, power: 24.0)),
+        (id: "wooden_club",   name: "Wooden Club",    kind: Tool(kind: Weapon,  tier: 1, power: 22.0)),
+        (id: "iron_sword",    name: "Iron Sword",     kind: Tool(kind: Weapon,  tier: 2, power: 40.0)),
+        (id: "campfire",      name: "Campfire",       kind: Structure(model: "campfire")),
+        (id: "workbench",     name: "Workbench",      kind: Structure(model: "workbench")),
+        (id: "furnace",       name: "Furnace",        kind: Structure(model: "furnace")),
+        (id: "beacon",        name: "Beacon",         kind: Structure(model: "beacon")),
+    ],
+
+    // station: structure that must be within station_radius; level: Crafting level needed.
+    // ESTIMATE: all values.
+    recipes: [
+        (output: "campfire",      count: 1, inputs: [("log", 3), ("stone", 2)],                  station: None,              level: 1, xp: 10.0),
+        (output: "workbench",     count: 1, inputs: [("log", 5), ("stone", 2)],                  station: None,              level: 1, xp: 15.0),
+        (output: "torch",         count: 1, inputs: [("log", 1)],                                station: Some("campfire"),  level: 1, xp: 5.0),
+        (output: "cooked_meat",   count: 1, inputs: [("raw_meat", 1)],                           station: Some("campfire"),  level: 1, xp: 5.0),
+        (output: "stone_axe",     count: 1, inputs: [("log", 2), ("stone", 3)],                  station: Some("workbench"), level: 1, xp: 15.0),
+        (output: "stone_pickaxe", count: 1, inputs: [("log", 2), ("stone", 3)],                  station: Some("workbench"), level: 1, xp: 15.0),
+        (output: "wooden_club",   count: 1, inputs: [("log", 3)],                                station: Some("workbench"), level: 1, xp: 15.0),
+        (output: "furnace",       count: 1, inputs: [("stone", 8), ("log", 2)],                  station: Some("workbench"), level: 2, xp: 20.0),
+        (output: "iron_bar",      count: 1, inputs: [("iron_ore", 2), ("log", 1)],               station: Some("furnace"),   level: 2, xp: 10.0),
+        (output: "iron_axe",      count: 1, inputs: [("iron_bar", 2), ("log", 2)],               station: Some("workbench"), level: 3, xp: 20.0),
+        (output: "iron_pickaxe",  count: 1, inputs: [("iron_bar", 2), ("log", 2)],               station: Some("workbench"), level: 3, xp: 20.0),
+        (output: "iron_sword",    count: 1, inputs: [("iron_bar", 3), ("wolf_pelt", 1)],         station: Some("workbench"), level: 3, xp: 25.0),
+        (output: "beacon",        count: 1, inputs: [("log", 10), ("stone", 10), ("iron_bar", 4)], station: Some("workbench"), level: 4, xp: 50.0),
+    ],
+
+    // Gathered by the swing's hit window. tool: which tool kind helps (min_tier 0 = bare hands
+    // work); yield per hit = base_yield + tool tier + skill bonus; charges = hits before depleted.
+    // ESTIMATE: all values.
+    nodes: [
+        (id: "tree_pine",  model: "tree_pine",  depleted_model: Some("tree_stump"), drop: "log",      base_yield: 1, charges: 4, respawn: 60.0, tool: Axe,     min_tier: 0, level: 1, skill: Woodcutting, xp: 6.0,  radius: 0.45, height: 4.0),
+        (id: "tree_round", model: "tree_round", depleted_model: Some("tree_stump"), drop: "log",      base_yield: 1, charges: 3, respawn: 60.0, tool: Axe,     min_tier: 0, level: 1, skill: Woodcutting, xp: 6.0,  radius: 0.45, height: 3.5),
+        (id: "rock",       model: "rock",       depleted_model: None,               drop: "stone",    base_yield: 1, charges: 4, respawn: 75.0, tool: Pickaxe, min_tier: 0, level: 1, skill: Mining,      xp: 6.0,  radius: 0.7,  height: 1.0),
+        (id: "iron_rock",  model: "iron_rock",  depleted_model: None,               drop: "iron_ore", base_yield: 1, charges: 3, respawn: 90.0, tool: Pickaxe, min_tier: 1, level: 2, skill: Mining,      xp: 12.0, radius: 0.7,  height: 1.1),
+        (id: "berry_bush", model: "berry_bush", depleted_model: None,               drop: "berries",  base_yield: 2, charges: 2, respawn: 45.0, tool: None,    min_tier: 0, level: 1, skill: None,        xp: 0.0,  radius: 0.5,  height: 1.0),
+    ],
+
+    // Wolves hunt at night: wander -> chase -> telegraphed bite (dodge i-frames avoid it) -> recover.
+    // ESTIMATE: all values.
+    enemies: [
+        (id: "wolf", hp: 60.0, radius: 0.45, wander_speed: 1.6, chase_speed: 5.4, sight: 14.0,
+         bite_range: 1.6, windup: 0.6, bite_damage: 15.0, recover: 0.9, xp: 25.0,
+         drops: [("raw_meat", 2), ("wolf_pelt", 1)]),
+    ],
+
+    // The island: 100 m square of land, camp at the centre. Positions are (x, z).
+    layout: (
+        half_size: 50.0,
+        camp: (0.0, 0.0),
+        wolf_spawns: [(-42.0, -42.0), (42.0, -42.0), (-42.0, 42.0), (42.0, 42.0), (0.0, 45.0)],
+        nodes: [
+            ("berry_bush", 5.0, 4.0), ("berry_bush", -5.0, 5.0), ("berry_bush", 3.0, -6.0),
+            ("tree_pine", -10.0, -3.0), ("tree_pine", -12.0, 2.0), ("tree_round", -14.0, -6.0),
+            ("tree_pine", -16.0, 4.0), ("tree_round", -18.0, -1.0), ("tree_pine", -20.0, 6.0),
+            ("tree_round", -22.0, -5.0), ("tree_pine", -24.0, 1.0), ("tree_pine", -13.0, 9.0),
+            ("tree_round", -19.0, 11.0), ("tree_pine", -26.0, -9.0), ("tree_round", -11.0, -10.0),
+            ("rock", 10.0, 2.0), ("rock", 12.0, -3.0), ("rock", 14.0, 4.0), ("rock", 16.0, -1.0),
+            ("rock", 18.0, 5.0), ("rock", 11.0, 8.0), ("rock", 20.0, -6.0),
+            ("iron_rock", -3.0, -30.0), ("iron_rock", 3.0, -32.0), ("iron_rock", 0.0, -36.0),
+            ("iron_rock", 6.0, -38.0),
+        ],
+    ),
+)

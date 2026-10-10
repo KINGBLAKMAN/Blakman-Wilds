@@ -41,12 +41,19 @@ pub struct Input {
     pub attack: Button,
     /// Hold to sprint (costs stamina).
     pub sprint: Button,
+    /// Light the Beacon when standing by it.
+    pub interact: Button,
+    /// Eat the most filling food you carry.
+    pub eat: Button,
+    /// Craft this recipe (index into `Content::recipes`) this tick.
+    pub craft: Option<usize>,
 }
 
 impl Input {
     pub fn clear_edges(&mut self) {
-        for b in [&mut self.jump, &mut self.dodge, &mut self.attack, &mut self.sprint] {
+        for b in [&mut self.jump, &mut self.dodge, &mut self.attack, &mut self.sprint, &mut self.interact, &mut self.eat] {
             b.clear_edges();
         }
+        self.craft = None;
     }
 }

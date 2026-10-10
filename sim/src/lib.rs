@@ -5,9 +5,11 @@
 //! can be tested headless and replayed exactly. The app only feeds input and draws state.
 
 pub mod actions;
+pub mod content;
 pub mod events;
 pub mod input;
 pub mod player;
+pub mod survival;
 pub mod tuning;
 pub mod world;
 
@@ -21,9 +23,11 @@ pub mod extracted {
 
 use glam::Vec3;
 
-pub use events::Event;
+pub use content::{Content, Skill, ToolKind};
+pub use events::{CraftError, Event};
 pub use input::{Button, Input};
 pub use player::{Player, State};
+pub use survival::{GameState, Survival, WolfState};
 pub use tuning::Tuning;
 pub use world::{Aabb, BoxWorld, SweepHit, World};
 
@@ -62,13 +66,23 @@ pub struct Sim {
     /// Ticks both sides stay frozen after a blow lands.
     pub hit_stop: u32,
     pub tick: u64,
+    /// Game content (items, recipes, nodes, enemies, tunables) from data/content.ron.
+    pub content: Content,
+    /// Survival state: inventory, skills, vitals, clock, nodes, structures, wolves.
+    pub survival: Survival,
 }
 
 impl Sim {
     pub fn new(world: BoxWorld, spawn: Vec3) -> Self {
+        Self::with_content(world, spawn, Content::default())
+    }
+
+    /// `spawn` doubles as the camp you wake at after dying.
+    pub fn with_content(world: BoxWorld, spawn: Vec3, content: Content) -> Self {
         let tuning = Tuning::default();
         let player = Player::new(spawn, &tuning);
-        Self { world, tuning, player, targets: Vec::new(), events: Vec::new(), hit_stop: 0, tick: 0 }
+        let survival = Survival::new(&content, spawn);
+        Self { world, tuning, player, targets: Vec::new(), events: Vec::new(), hit_stop: 0, tick: 0, content, survival }
     }
 
     /// The default sandbox: the arena with one target in front of the spawn.
@@ -81,23 +95,49 @@ impl Sim {
     pub fn step(&mut self, input: &Input) {
         self.events.clear();
         self.tick += 1;
+        if self.survival.state == GameState::Victory {
+            return;
+        }
 
         if self.hit_stop > 0 {
             self.hit_stop -= 1;
             return;
         }
-        self.player.step(input, &self.world, &self.tuning, &mut self.events);
+        self.step_clock();
+        if self.alive() {
+            self.player.step(input, &self.world, &self.tuning, &mut self.events);
+            if let Some(r) = input.craft {
+                self.craft(r);
+            }
+            if input.eat.pressed {
+                self.eat();
+            }
+            if input.interact.pressed {
+                self.interact();
+            }
+        } else {
+            self.step_dead();
+        }
         self.separate_bodies();
         self.resolve_hits();
         self.respawn_targets();
+        self.step_nodes();
+        self.step_wolves();
+        self.step_vitals();
     }
 
     /// Characters are solid to each other: you cannot run or roll through a target.
     fn separate_bodies(&mut self) {
         let half = self.tuning.half_extents;
-        for t in &self.targets {
+        let nodes = self.survival.nodes.iter().filter(|n| n.alive()).map(|n| {
+            let d = &self.content.nodes[n.kind];
+            (n.pos, d.radius, d.height)
+        });
+        let bodies: Vec<_> = self.targets.iter().filter(|t| t.alive()).map(|t| (t.pos, t.radius, t.height)).chain(nodes).collect();
+        for (pos, radius, height) in bodies {
+            let t = Target { pos, radius, height, hp: 1.0, max_hp: 1.0, respawn: 0.0 };
             let p = &mut self.player;
-            if !t.alive() || (p.pos.y - t.pos.y).abs() > t.height {
+            if (p.pos.y - t.pos.y).abs() > t.height {
                 continue;
             }
             let mut away = Vec3::new(p.pos.x - t.pos.x, 0.0, p.pos.z - t.pos.z);
@@ -116,9 +156,34 @@ impl Sim {
         }
     }
 
-    /// A swing lands when the weapon line actually reaches a target, once per action.
+    /// A swing lands when the weapon line actually reaches something, once per action:
+    /// a wolf first, then a resource node, then a sandbox target.
     fn resolve_hits(&mut self) {
         let Some((def, from, to)) = self.player.weapon_line() else { return };
+        let r = self.tuning.weapon_radius;
+        let reaches = |pos: Vec3, radius: f32, height: f32| {
+            let (a, b) = (pos + Vec3::Y * radius, pos + Vec3::Y * (height - radius).max(radius));
+            world::segment_distance(from, to, a, b) <= radius + r
+        };
+        let wolf = self.survival.wolves.iter().position(|w| {
+            reaches(w.pos, self.content.enemies[w.kind].radius, survival::WOLF_HEIGHT)
+        });
+        if let Some(i) = wolf {
+            self.player.mark_connected();
+            self.hit_stop = self.tuning.hit_stop_ticks;
+            self.hit_wolf(i);
+            return;
+        }
+        let node = self.survival.nodes.iter().position(|n| {
+            let d = &self.content.nodes[n.kind];
+            n.alive() && reaches(n.pos, d.radius, d.height)
+        });
+        if let Some(i) = node {
+            self.player.mark_connected();
+            self.hit_stop = self.tuning.hit_stop_ticks;
+            self.hit_node(i);
+            return;
+        }
         for (i, t) in self.targets.iter_mut().enumerate() {
             if !t.alive() {
                 continue;

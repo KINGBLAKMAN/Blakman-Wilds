@@ -7,3 +7,6 @@ edition = "2021"
 # version Bevy 0.16 uses, so `glam::Vec3` *is* `bevy::math::Vec3`).
 [dependencies]
 glam = "0.29"
+# Game content (items, recipes, nodes, enemies, tunables, island layout) is data: data/content.ron.
+serde = { version = "1", features = ["derive"] }
+ron = "0.8"
