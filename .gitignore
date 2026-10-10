@@ -1,0 +1,20 @@
+/target
+/dist
+
+# Unpacked game files and large binary bakes (size, not secrecy: commit generated/extracted.rs if you like)
+/game-files
+/assets/*.bin
+/assets/sounds
+
+# Reverse-engineering scratch (large; lives in %USERPROFILE%\re-private by default)
+*.gpr
+*.rep
+
+# Local captures and logs
+/captures
+error.log
+.claude/settings.local.json
+.claude/worktrees/
+
+__pycache__/
+*.pyc

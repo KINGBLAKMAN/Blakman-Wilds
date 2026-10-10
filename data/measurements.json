@@ -1,0 +1,174 @@
+{
+  "_how": "status: PUBLIC = public source (named); MEASURED = from your own clips; VIDEO = estimated from public gameplay video (frame refs given); ESTIMATE = starting guess. Run: python tools/setup.py",
+  "scalars": {
+    "WALK_SPEED": {
+      "value": 2.0,
+      "unit": "m/s",
+      "status": "ESTIMATE",
+      "source": "shot 1 (walk) not measured yet"
+    },
+    "RUN_SPEED": {
+      "value": 5.0,
+      "unit": "m/s",
+      "status": "ESTIMATE",
+      "source": "shot 2 (run) not measured yet"
+    },
+    "SPRINT_SPEED": {
+      "value": 7.5,
+      "unit": "m/s",
+      "status": "ESTIMATE",
+      "source": "shot 3 (sprint) not measured yet"
+    },
+    "ACCEL": {
+      "value": 20.0,
+      "unit": "m/s2",
+      "status": "ESTIMATE",
+      "source": "shot 4 (start from standstill) not measured yet"
+    },
+    "BRAKING": {
+      "value": 25.0,
+      "unit": "m/s2",
+      "status": "ESTIMATE",
+      "source": "shot 5 (stop from run) not measured yet"
+    },
+    "AIR_ACCEL": {
+      "value": 4.0,
+      "unit": "m/s2",
+      "status": "ESTIMATE",
+      "source": "shot 7 (air steering) not measured yet"
+    },
+    "GRAVITY": {
+      "value": 19.6,
+      "unit": "m/s2",
+      "status": "ESTIMATE",
+      "source": "shot 6 (jump) not measured yet; UE default 9.8 x GravityScale 2 is common"
+    },
+    "JUMP_HEIGHT": {
+      "value": 1.0,
+      "unit": "m",
+      "status": "ESTIMATE",
+      "source": "shot 6 (jump beside a wall) not measured yet; video: a running jump onto a raised block took about 25 frames (0.42 s) airborne (Z-JD38KiMfA f1679-1704), not enough to separate height from gravity"
+    },
+    "STAMINA_MAX": {
+      "value": 100.0,
+      "unit": "points",
+      "status": "PUBLIC",
+      "source": "dragonwilds.runescape.wiki/w/Stamina (rev 66030, 2026-08-26): maximum stamina 100 (rest above 50)"
+    },
+    "SPRINT_DRAIN": {
+      "value": 4.0,
+      "unit": "points/s",
+      "status": "PUBLIC",
+      "source": "dragonwilds.runescape.wiki/w/Stamina (rev 66030, 2026-08-26): Running 4/s"
+    },
+    "STAMINA_REGEN": {
+      "value": 6.0,
+      "unit": "points/s",
+      "status": "PUBLIC",
+      "source": "dragonwilds.runescape.wiki/w/Stamina (rev 66030, 2026-08-26): regen 6.0/s at 100 hydration (0.75/s at 0, +1.5/s per 25)"
+    },
+    "STAMINA_REGEN_DELAY": {
+      "value": 3.0,
+      "unit": "s",
+      "status": "PUBLIC",
+      "source": "dragonwilds.runescape.wiki/w/Stamina (rev 66030, 2026-08-26): regen starts 3s after the last stamina-costing action"
+    },
+    "CAM_FOV": {
+      "value": 80.0,
+      "unit": "deg (vertical)",
+      "status": "ESTIMATE",
+      "source": "game settings default / shot 11"
+    },
+    "CAM_ARM": {
+      "value": 3.2,
+      "unit": "m",
+      "status": "ESTIMATE",
+      "source": "shot 11 (camera framing)"
+    },
+    "CAM_HEIGHT": {
+      "value": 1.6,
+      "unit": "m",
+      "status": "ESTIMATE",
+      "source": "shot 11 (pivot height)"
+    },
+    "CAM_SHOULDER": {
+      "value": 0.0,
+      "unit": "m right",
+      "status": "VIDEO",
+      "source": "YouTube Z-JD38KiMfA (Chasm Dash gold run, 1.0, 720p60) and h7zIeNwdXCU (agility update, 720p60): character stays horizontally centred while running in every third-person shot (e.g. Z-JD38KiMfA f3540-3660, h7zIeNwdXCU 94-126 s)"
+    },
+    "CAM_LAG": {
+      "value": 10.0,
+      "unit": "1/s",
+      "status": "ESTIMATE",
+      "source": "shot 12 (frames to settle after a stop)"
+    },
+    "JUMP_STAMINA": {
+      "value": 10.0,
+      "unit": "points",
+      "status": "PUBLIC",
+      "source": "dragonwilds.runescape.wiki/w/Stamina (rev 66030, 2026-08-26): Jumping 10 per action; 0.12.1 patch notes: jump cost reduced from 20 to 10 (current)"
+    }
+  },
+  "actions": [
+    {
+      "name": "Roll",
+      "status": "PUBLIC+ESTIMATE",
+      "source": "stamina 20 from dragonwilds.runescape.wiki/w/Stamina (rev 66030, 2026-08-26) (Dodging 20); timing and distance still ESTIMATE (shot 10)",
+      "len": 24,
+      "hit": null,
+      "iframes": [
+        0,
+        10
+      ],
+      "input_from": 12,
+      "cancel_into_attack": 20,
+      "cancel_into_dodge": 22,
+      "cancel_into_move": 20,
+      "root_motion": 3.5,
+      "stamina": 20,
+      "damage": 0,
+      "reach": 0
+    },
+    {
+      "name": "Light1",
+      "status": "ESTIMATE",
+      "source": "combat is out of scope; template placeholder",
+      "len": 30,
+      "hit": [
+        10,
+        14
+      ],
+      "iframes": null,
+      "input_from": 8,
+      "cancel_into_attack": 18,
+      "cancel_into_dodge": 16,
+      "cancel_into_move": 24,
+      "root_motion": 0.6,
+      "stamina": 12,
+      "damage": 30,
+      "reach": 1.6,
+      "next": "Light2"
+    },
+    {
+      "name": "Light2",
+      "status": "ESTIMATE",
+      "source": "combat is out of scope; template placeholder",
+      "len": 32,
+      "hit": [
+        11,
+        15
+      ],
+      "iframes": null,
+      "input_from": 8,
+      "cancel_into_attack": 20,
+      "cancel_into_dodge": 16,
+      "cancel_into_move": 26,
+      "root_motion": 0.7,
+      "stamina": 12,
+      "damage": 32,
+      "reach": 1.6,
+      "next": "Light1"
+    }
+  ]
+}

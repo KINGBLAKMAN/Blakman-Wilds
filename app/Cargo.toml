@@ -1,0 +1,9 @@
+[package]
+name = "rewrite-app"
+version = "0.1.0"
+edition = "2021"
+
+# Thin presentation layer: input in, drawing and sound out. All rules live in `sim`.
+[dependencies]
+sim = { path = "../sim" }
+bevy = "0.16"

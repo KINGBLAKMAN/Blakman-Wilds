@@ -1,0 +1,9 @@
+[package]
+name = "sim"
+version = "0.1.0"
+edition = "2021"
+
+# The whole game as a pure fixed-step state machine. No engine types: only glam (the same
+# version Bevy 0.16 uses, so `glam::Vec3` *is* `bevy::math::Vec3`).
+[dependencies]
+glam = "0.29"
